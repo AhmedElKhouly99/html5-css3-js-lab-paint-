@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: rgb(204, 198, 204);
+        }
+        canvas{
+            background-color: white;
+            display: block;
+            margin: auto;
+            border: 5px solid rgb(90, 62, 62);
+            border-radius: 12px;
+        }
+        button{
+            padding: 1%;
+            background-color: red;
+            border-radius: 8px;
+            color: white;
+            margin: 3% 7%;
+        }
+    </style>
+</head>
+<body>
+    <button id="pencil">Pencil</button>
+    <button id="line">Line</button>
+    <button id="rect">Rectangle</button>
+    <button id="arc">Circle</button>
+    <button id="erase">Erase</button>
+    <input id="color" type="color">
+    <canvas id="board" width="1000" height="600"></canvas>
+
+    <script>
+        const board = document.getElementById("board");
+        const pencil = document.getElementById("pencil");
+        let pencilFlag = false;
+        const line = document.getElementById("line");
+        let lineFlag = false;
+        const rect = document.getElementById("rect");
+        let rectFlag = false;
+        const arc = document.getElementById("arc");
+        let arcFlag = false;
+        const erase = document.getElementById("erase");
+        let eraseFlag = false;
+        let clicked = false;
+        let rxstart = 0;
+        let rystart = 0;
+        let rxend = 0;
+        let ryend = 0;
+        let cx = 0;
+        let cy = 0;
+        let cx2 = 0;
+        let cy2 = 0;
+        let r = 0;
+        const col = document.getElementById("color");
+        let color = col;
+
+        var ctx = board.getContext("2d");
+
+        pencil.addEventListener('click', ()=>{
+            pencilFlag = true;
+            lineFlag = false;
+            rectFlag = false;
+            arcFlag = false;
+            eraseFlag = false;
+        })
+
+        line.addEventListener('click', ()=>{
+            pencilFlag = false;
+            lineFlag = true;
+            rectFlag = false;
+            arcFlag = false;
+            eraseFlag = false;
+        })
+        rect.addEventListener('click', ()=>{
+            pencilFlag = false;
+            lineFlag = false;
+            rectFlag = true;
+            arcFlag = false;
+            eraseFlag = false;
+        })
+        arc.addEventListener('click', ()=>{
+            pencilFlag = false;
+            lineFlag = false;
+            rectFlag = false;
+            arcFlag = true;
+            eraseFlag = false;
+        })
+        erase.addEventListener('click', ()=>{
+            pencilFlag = false;
+            lineFlag = false;
+            rectFlag = false;
+            arcFlag = false;
+            eraseFlag = true;
+        })
+
+        board.addEventListener('mousedown', (e)=>{
+            color = col.value;
+             ctx.beginPath();
+             ctx.lineWidth = '5'
+             ctx.strokeStyle = color;
+            if(pencilFlag || lineFlag){
+                ctx.moveTo(e.offsetX, e.offsetY);
+            }else if(rectFlag){
+                rxstart = e.offsetX;
+                rystart = e.offsetY;
+            }else if(eraseFlag){
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = '20'
+                ctx.moveTo(e.offsetX, e.offsetY);
+            }else if(arcFlag){
+                cx = e.offsetX;
+                cy = e.offsetY;
+            }
+            clicked = true;
+        })
+
+        board.addEventListener('mousemove', (e)=>{
+            if(clicked){
+                if(pencilFlag){
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }else if(eraseFlag){
+                    
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    
+                    ctx.stroke();
+                }
+            }
+        })
+
+        board.addEventListener('mouseup', (e)=>{
+            if(lineFlag){
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }else if(rectFlag){
+                rxend = e.offsetX;
+                ryend = e.offsetY;
+                ctx.rect(rxstart, rystart, rxend-rxstart, ryend-rystart);
+                ctx.stroke();
+            }else if(arcFlag){
+                cx2 = e.offsetX;
+                cy2 = e.offsetY;
+                r = Math.sqrt(Math.pow((cx2-cx),2) + Math.pow((cy2-cy),2));
+                ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+                ctx.stroke();
+            }  
+            clicked = false;
+        })
+
+    </script>
+</body>
+</html>
